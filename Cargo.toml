@@ -11,7 +11,6 @@ eiz = { git = "https://github.com/eiz/eiz", features = [
     "nvenc",
     "use_std",
 ] }
-float-ord = "0.3"
 rand = "0.8"
 winapi = { version = "0.3", features = [
     "combaseapi",

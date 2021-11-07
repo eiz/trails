@@ -1,6 +1,5 @@
 use anyhow::Result;
 use eiz::com::{com_new, com_new_void, ComError, ComPtr};
-use float_ord::FloatOrd;
 use rand::{prelude::StdRng, Rng, SeedableRng};
 use std::{cmp, f32::consts::PI, ffi::c_void, marker::PhantomData, ptr, time::Instant};
 use structopt::StructOpt;
@@ -22,9 +21,8 @@ use winapi::{
             D3D11CreateDevice, ID3D11Buffer, ID3D11ComputeShader, ID3D11Device,
             ID3D11DeviceContext, ID3D11RenderTargetView, ID3D11Resource, ID3D11Texture2D,
             ID3D11UnorderedAccessView, D3D11_BIND_CONSTANT_BUFFER, D3D11_BIND_RENDER_TARGET,
-            D3D11_BIND_UNORDERED_ACCESS, D3D11_BOX, D3D11_BUFFER_DESC,
-            D3D11_RESOURCE_MISC_BUFFER_STRUCTURED, D3D11_SDK_VERSION, D3D11_SUBRESOURCE_DATA,
-            D3D11_TEXTURE2D_DESC, D3D11_USAGE_DEFAULT,
+            D3D11_BIND_UNORDERED_ACCESS, D3D11_BUFFER_DESC, D3D11_RESOURCE_MISC_BUFFER_STRUCTURED,
+            D3D11_SDK_VERSION, D3D11_SUBRESOURCE_DATA, D3D11_TEXTURE2D_DESC, D3D11_USAGE_DEFAULT,
         },
         d3dcommon::D3D_DRIVER_TYPE_HARDWARE,
         synchapi::WaitForSingleObject,
@@ -96,7 +94,6 @@ impl Dx11Context {
 struct Dx11SwapChain {
     inner: ComPtr<IDXGISwapChain3>,
     back_buffer: ComPtr<ID3D11Resource>,
-    rtv: ComPtr<ID3D11RenderTargetView>,
     wait_handle: HANDLE,
 }
 
@@ -140,16 +137,10 @@ impl Dx11SwapChain {
         let back_buffer = com_new(|x: *mut *mut ID3D11Resource| unsafe {
             inner.GetBuffer(0, &ID3D11Resource::uuidof(), x as *mut *mut _)
         })?;
-        let rtv = com_new(|x| unsafe {
-            device
-                .inner
-                .CreateRenderTargetView(back_buffer.as_ptr(), ptr::null(), x)
-        })?;
         let wait_handle = unsafe { inner.GetFrameLatencyWaitableObject() };
         Ok(Self {
             inner,
             back_buffer,
-            rtv,
             wait_handle,
         })
     }
@@ -199,10 +190,6 @@ impl Dx11Texture2D {
         }
         Ok(Self { inner, rtv, uav })
     }
-}
-
-macro_rules! buffer_type {
-    ($name:ident, $usage:expr, $bind:expr) => {};
 }
 
 #[derive(Clone)]
@@ -293,12 +280,6 @@ impl<T: Copy> Dx11ConstantBuffer<T> {
         }
     }
 }
-
-buffer_type!(
-    Dx11ConstantBuffer,
-    D3D11_USAGE_DEFAULT,
-    D3D11_BIND_CONSTANT_BUFFER
-);
 
 #[derive(Clone)]
 struct Dx11ComputeShader {
