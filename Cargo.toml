@@ -1,0 +1,30 @@
+[package]
+name = "trails"
+version = "0.1.0"
+edition = "2018"
+authors = ["Mack Straight <mack@discord.com>", "Sam Schlegel"]
+
+[dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
+eiz = { git = "https://github.com/eiz/eiz", features = [
+    "com",
+    "nvenc",
+    "use_std",
+] }
+float-ord = "0.3"
+rand = "0.8"
+winapi = { version = "0.3", features = [
+    "combaseapi",
+    "d3d11",
+    "d3dcommon",
+    "dxgi",
+    "dxgi1_3",
+    "dxgi1_4",
+] }
+winit = "0.25"
+structopt = "0.3"
+
+[build-dependencies]
+anyhow = "1"
+eiz = { git = "https://github.com/eiz/eiz", features = ["com", "use_std"] }
+winapi = { version = "0.3", features = ["d3dcompiler"] }
