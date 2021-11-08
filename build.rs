@@ -92,8 +92,13 @@ fn compile_shader<P: AsRef<Path>>(path: P, target: &str, entry: &str) -> anyhow:
 fn main() -> anyhow::Result<()> {
     compile_shader("shader/slime.hlsl", "cs_5_0", "advance_agents")?;
     compile_shader("shader/slime.hlsl", "cs_5_0", "decay_and_diffuse")?;
+    compile_shader("shader/scrgb_to_hdr10.hlsl", "cs_5_0", "convert")?;
 
-    let build_files = &["shader/slime.hlsl"];
+    let build_files = &[
+        "shader/common.inc",
+        "scrgb_to_hdr10.hlsl",
+        "shader/slime.hlsl",
+    ];
 
     for file in build_files {
         println!["cargo:rerun-if-changed={}", file];

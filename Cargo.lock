@@ -1111,6 +1111,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "eiz",
+ "lazy_static",
  "rand",
  "structopt",
  "winapi",
